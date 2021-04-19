@@ -49,6 +49,12 @@ public class EstadoController {
         return service.findAll();
     }
 
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletar(@PathVariable Integer id) {
+        Estado estado = service.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        service.delete(estado);
+    }
 
 
 }

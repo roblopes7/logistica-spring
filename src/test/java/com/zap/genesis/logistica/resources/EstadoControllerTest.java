@@ -186,7 +186,7 @@ public class EstadoControllerTest {
 
     @Test
     @DisplayName("Deve ocorrer erro por dados obrigatórios nulos.")
-    public void updateNonexistentBookTest() throws Exception {
+    public void atualizarEstadoNaoEncontradoTeste() throws Exception {
 
         Integer id = 1;
         String json = new ObjectMapper().writeValueAsString(new Estado());
@@ -208,6 +208,36 @@ public class EstadoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON);
 
         mvc.perform(request).andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    //DELETE
+
+    @Test
+    @DisplayName("Deve deletar um estado")
+    public void deletarEstadoTeste() throws Exception {
+
+        BDDMockito.given(service.getById(ArgumentMatchers.anyInt())).willReturn(Optional.of(Estado.builder().codigo(1).build()));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(ESTADOS_API + "/" + 1)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(request).andExpect(MockMvcResultMatchers.status().isNoContent());
+
+    }
+
+    @Test
+    @DisplayName("Deve retornar não encontrado quando não encontrar o estado para deletar")
+    public void deletarEstadoNaoEncontradoTeste() throws Exception {
+
+        BDDMockito.given(service.getById(ArgumentMatchers.anyInt())).willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(ESTADOS_API + "/" + 1)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(request).andExpect(MockMvcResultMatchers.status().isNotFound());
+
     }
 
 

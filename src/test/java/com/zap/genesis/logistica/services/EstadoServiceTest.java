@@ -101,6 +101,26 @@ public class EstadoServiceTest {
         assertThat(estado.getSigla()).isEqualTo(estadoAtualizado.getSigla());
     }
 
+    //DELETE
+
+    @Test
+    @DisplayName("Deve deletar um estado")
+    public void deletarEstadoTeste() {
+        Estado estado = gerarEstadoValido();
+        estado.setCodigo(1);
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> service.delete(estado));
+        Mockito.verify(repository, Mockito.times(1)).delete(estado);
+
+    }
+
+    @Test
+    @DisplayName("Deve ocorrer erro ao tentar deletar um estado inexistente.")
+    public void deletarEstadoInexistenteTeste() {
+        Estado estado = new Estado();
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.delete(estado));
+        Mockito.verify(repository, Mockito.never()).delete(estado);
+    }
+
 
     //UTILS
 

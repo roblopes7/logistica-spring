@@ -14,4 +14,6 @@ public interface EstadoService {
     Estado update(Estado atualizado);
 
     List<Estado> findAll();
+
+    void delete(Estado estado);
 }

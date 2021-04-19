@@ -42,5 +42,13 @@ public class EstadoServiceImp implements EstadoService {
         return estadoRepository.findAll();
     }
 
+    @Override
+    public void delete(Estado estado) {
+        if(estado == null || estado.getCodigo() == null){
+            throw new IllegalArgumentException("Estado não cadastrado anteriormente.");
+        }
+        estadoRepository.delete(estado);
+    }
+
 
 }

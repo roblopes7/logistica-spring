@@ -28,15 +28,65 @@ public class EstadoRepositoryTest {
     EstadoRepository repository;
 
 
+    //POST
+
     @Test
-    @DisplayName("Deve salvar um livro")
-    public void saveBookTeste(){
+    @DisplayName("Deve salvar um estado")
+    public void salvarEstadoTeste(){
         Estado estado = gerarEstado();
         Estado estadoGravado = repository.save(estado);
 
         Assertions.assertThat(estadoGravado.getCodigo()).isNotNull();
     }
 
+
+    //GET
+
+    @Test
+    @DisplayName("Deve obter um estado por ID")
+    public void filtrarPorIDTeste(){
+        Estado estado = gerarEstado();
+        entityManager.persist(estado);
+        Optional<Estado> estadoencontrado = repository.findById(estado.getCodigo());
+        Assertions.assertThat(estadoencontrado.isPresent()).isTrue();
+
+    }
+
+
+    //UPDATE
+
+    @Test
+    @DisplayName("Deve editar um estado")
+    public void ediatarEstadoTeste(){
+        Estado estado = gerarEstado();
+        entityManager.persist(estado);
+
+        Estado estadoAtualizado = Estado.builder().codigo(estado.getCodigo()).nome("California").pais("Estados Unidos").sigla("CA").build();
+
+        Estado estadoRetornado = repository.save(estadoAtualizado);
+
+        Assertions.assertThat(estadoRetornado.getCodigo()).isEqualTo(estado.getCodigo());
+        Assertions.assertThat(estadoRetornado.getSigla()).isEqualTo(estado.getSigla());
+        Assertions.assertThat(estadoRetornado.getPais()).isEqualTo(estado.getPais());
+        Assertions.assertThat(estadoRetornado.getNome()).isEqualTo(estado.getNome());
+    }
+
+    //DELETE
+
+    @Test
+    @DisplayName("Deve deletar um estado")
+    public void deletarEstadoTest(){
+        Estado estado = gerarEstado();
+        entityManager.persist(estado);
+
+        Estado estadoEncontrado = entityManager.find(Estado.class, estado.getCodigo());
+        repository.delete(estadoEncontrado);
+        Estado estadoDeletado = entityManager.find(Estado.class, estado.getCodigo());
+        Assertions.assertThat(estadoDeletado).isNull();
+    }
+
+
+    //UTILS
     private Estado gerarEstado() {
         return Estado.builder()
                 .nome("Paraná")
