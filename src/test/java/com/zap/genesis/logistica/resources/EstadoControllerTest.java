@@ -7,6 +7,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,6 +133,82 @@ public class EstadoControllerTest {
     //MÉTODOS UPDATE
 
 
+    @Test
+    @DisplayName("Deve atualizar um estado")
+    public void atualizarEstadoTeste() throws Exception {
+
+        Integer id = 1;
+        String json = new ObjectMapper().writeValueAsString(gerarEstadoValido());
+        Estado estadoAtualizando = Estado.builder()
+                .codigo(id)
+                .pais("Brasil")
+                .nome("Santa Catarina")
+                .sigla("SC")
+                .build();
+        Estado estadoAtualizado = Estado.builder().codigo(id).nome("EstadoTeste").pais("Barsil-Teste").sigla("TBR").build();
+        BDDMockito.given(service.getById(id)).willReturn(Optional.of(estadoAtualizando));
+
+        BDDMockito.given(service.update(estadoAtualizando)).willReturn(estadoAtualizado);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(ESTADOS_API + "/" + 1)
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        Estado validador = gerarEstadoValido();
+
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("codigo").value(id))
+                .andExpect(MockMvcResultMatchers.jsonPath("nome").value(validador.getNome()))
+                .andExpect(MockMvcResultMatchers.jsonPath("sigla").value(validador.getSigla()))
+                .andExpect(MockMvcResultMatchers.jsonPath("pais").value(validador.getPais()));
+
+    }
+
+
+    @Test
+    @DisplayName("Deve tentar atualizar um estado inexistente")
+    public void atualizarEstadoInexistenteErroTeste() throws Exception {
+
+        String json = new ObjectMapper().writeValueAsString(gerarEstadoValido());
+        BDDMockito.given(service.getById(ArgumentMatchers.anyInt())).willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(ESTADOS_API + "/" + 1)
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(request).andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Deve ocorrer erro por dados obrigatórios nulos.")
+    public void updateNonexistentBookTest() throws Exception {
+
+        Integer id = 1;
+        String json = new ObjectMapper().writeValueAsString(new Estado());
+        Estado estadoAtualizando = Estado.builder()
+                .codigo(id)
+                .pais("Brasil")
+                .nome("Santa Catarina")
+                .sigla("SC")
+                .build();
+
+        BDDMockito.given(service.getById(id)).willReturn(Optional.of(estadoAtualizando));
+
+        BDDMockito.given(service.update(estadoAtualizando)).willReturn(new Estado());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(ESTADOS_API + "/" + 1)
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mvc.perform(request).andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
 
 
     //MÉTODOS UTILS

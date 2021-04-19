@@ -23,8 +23,8 @@ public class Estado {
     @Column(name = "idestado")
     private Integer codigo;
     @Column(name = "nome", nullable = false)
-    @NotEmpty
-    @Size(min = 2, max = 50)
+    @NotEmpty(message = "Nome do estado obrigatório.")
+    @Size(min = 2, max = 50, message = "Nome do estado deve ter entre 2 e 50 caracteres.")
     private String nome;
     @Column(name = "sigla")
     @Size(max = 3)

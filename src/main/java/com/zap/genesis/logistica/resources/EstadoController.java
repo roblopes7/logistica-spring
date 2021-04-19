@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/estados")
@@ -32,6 +33,22 @@ public class EstadoController {
                 .getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
+
+    @PutMapping("{id}")
+    public Estado atualizar(@PathVariable Integer id,@RequestBody @Valid Estado atualizado) {
+        return  service.getById(id).map(estado -> {
+            estado.setSigla(atualizado.getSigla());
+            estado.setPais(atualizado.getPais());
+            estado.setNome(atualizado.getNome());
+            estado = service.update(estado);
+            return modelMapper.map(estado, Estado.class);
+        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));    }
+
+    @GetMapping()
+    public List<Estado> retornarTodosEstados(){
+        return service.findAll();
+    }
+
 
 
 }

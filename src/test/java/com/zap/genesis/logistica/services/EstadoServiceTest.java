@@ -75,6 +75,35 @@ public class EstadoServiceTest {
         assertThat(estadoEncontrado.isPresent()).isFalse();
     }
 
+    //UPDATE
+
+    @Test
+    @DisplayName("Deve ocorrer erro ao tentar editar um estado inexistente.")
+    public void atualizarEstadoInexistenteTeste() {
+        Estado estado = new Estado();
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.update(estado));
+        Mockito.verify(repository, Mockito.never()).save(estado);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar um estado")
+    public void atualizarEstadoTeste(){
+        Estado estadoAtualizando = Estado.builder().codigo(1).build();
+
+        Estado estadoAtualizado = gerarEstadoValido();
+        estadoAtualizado.setCodigo(1);
+        Mockito.when(repository.save(estadoAtualizando)).thenReturn(estadoAtualizado);
+
+        Estado estado = service.update(estadoAtualizando);
+        assertThat(estado.getCodigo()).isEqualTo(estadoAtualizado.getCodigo());
+        assertThat(estado.getNome()).isEqualTo(estadoAtualizado.getNome());
+        assertThat(estado.getPais()).isEqualTo(estadoAtualizado.getPais());
+        assertThat(estado.getSigla()).isEqualTo(estadoAtualizado.getSigla());
+    }
+
+
+    //UTILS
+
     private Estado gerarEstadoValido() {
         return Estado.builder().nome("EstadoTeste").pais("Barsil-Teste").sigla("TBR").build();
     }
